@@ -1,11 +1,13 @@
 import { motion, useAnimation, useViewportScroll } from "framer-motion";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
+import { useMatch, useNavigate } from "react-router-dom";
 import { useRecoilState } from "recoil";
 import styled from "styled-components";
 import { searchState } from "../atom";
 
 const Container = styled(motion.header)`
+  z-index: 100;
   position: fixed;
   top: 0;
   left: 0;
@@ -15,8 +17,11 @@ const Container = styled(motion.header)`
   align-items: center;
   width: 100vw;
   height: 70px;
-  padding: 0 3vw;
+  padding: 0 50px;
   background-color: rgba(0, 0, 0, 0);
+  @media (max-width: 600px) {
+    padding: 0 18px;
+  }
 `;
 const Left = styled.section`
   display: flex;
@@ -60,7 +65,11 @@ interface iSearchForm {
 }
 
 function Header() {
+  const navigate = useNavigate();
+  const homeMatch = useMatch("/");
+  const tvMatch = useMatch("/tv");
   const { register, handleSubmit } = useForm<iSearchForm>();
+  const { scrollY } = useViewportScroll();
   const onSearchValid = ({ search }: iSearchForm) => {
     console.log(search);
   };
@@ -78,7 +87,6 @@ function Header() {
       buttonAnimation.start({ x: 0 });
     }
   };
-  const { scrollY } = useViewportScroll();
   useEffect(
     () =>
       scrollY.onChange(() => {
@@ -104,8 +112,21 @@ function Header() {
         </svg>
         <Nav>
           <ul>
-            <li>홈</li>
-            <li>시리즈</li>
+            <li
+              style={{
+                fontWeight: homeMatch ? "700" : "300",
+                cursor: "pointer",
+              }}
+              onClick={() => navigate("/")}
+            >
+              홈
+            </li>
+            <li
+              style={{ fontWeight: tvMatch ? "700" : "300", cursor: "pointer" }}
+              onClick={() => navigate("/tv")}
+            >
+              시리즈
+            </li>
           </ul>
         </Nav>
       </Left>

@@ -1,13 +1,12 @@
 import { createGlobalStyle, ThemeProvider } from "styled-components";
-import Header from "./Components/Header";
 import Router from "./Router";
 import { darkTheme } from "./theme";
 
 const GlobalStyle = createGlobalStyle`
   body {
-    background-color: ${(props) => props.theme.bgColor};
+    overflow-x: hidden;
+    background-color: ${(props) => props.theme.bgColor.default};
     color: ${(props) => props.theme.textColor.default};
-    height: 300vh;
   }
   button {
     border: none;
@@ -28,7 +27,6 @@ function App() {
     <>
       <ThemeProvider theme={darkTheme}>
         <GlobalStyle />
-        <Header />
         <Router />
       </ThemeProvider>
     </>
