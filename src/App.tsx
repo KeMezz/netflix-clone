@@ -1,6 +1,9 @@
-import { createGlobalStyle, ThemeProvider } from "styled-components";
+import { useRecoilValue } from "recoil";
+import styled, { createGlobalStyle, ThemeProvider } from "styled-components";
+import { windowSizeAtom } from "./atom";
 import Router from "./Router";
 import { darkTheme } from "./theme";
+import { useWindowSize } from "./useWindowSize";
 
 const GlobalStyle = createGlobalStyle`
   body {
@@ -22,12 +25,40 @@ const GlobalStyle = createGlobalStyle`
   }
 `;
 
+const TooSmallWarning = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  gap: 3vh;
+  i {
+    font-size: 6vw;
+    color: yellow;
+  }
+  h1 {
+    font-size: 4vw;
+    font-weight: 700;
+  }
+`;
+
 function App() {
+  useWindowSize();
+  const windowSize = useRecoilValue(windowSizeAtom);
   return (
     <>
       <ThemeProvider theme={darkTheme}>
         <GlobalStyle />
-        <Router />
+        {windowSize.width > 1200 ? (
+          <Router />
+        ) : (
+          <TooSmallWarning
+            style={{ width: window.innerWidth, height: window.innerHeight }}
+          >
+            <i className="fas fa-exclamation-triangle" />
+            <h1>모바일 버전은 아직 지원되지 않습니다.</h1>
+          </TooSmallWarning>
+        )}
       </ThemeProvider>
     </>
   );
