@@ -25,7 +25,7 @@ const GlobalStyle = createGlobalStyle`
   }
 `;
 
-const TooSmallWarning = styled.div`
+const MobileWarning = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -52,12 +52,12 @@ function App() {
         {windowSize.width > 1200 ? (
           <Router />
         ) : (
-          <TooSmallWarning
+          <MobileWarning
             style={{ width: window.innerWidth, height: window.innerHeight }}
           >
             <i className="fas fa-exclamation-triangle" />
             <h1>모바일 버전은 아직 지원되지 않습니다.</h1>
-          </TooSmallWarning>
+          </MobileWarning>
         )}
       </ThemeProvider>
     </>

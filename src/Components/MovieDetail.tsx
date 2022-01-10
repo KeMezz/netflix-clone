@@ -1,4 +1,4 @@
-import { AnimatePresence, motion } from "framer-motion";
+import { motion } from "framer-motion";
 import { useQuery } from "react-query";
 import styled from "styled-components";
 import { fetchMovieDetail } from "../api";
@@ -8,10 +8,10 @@ const DetailContainer = styled(motion.div)`
   z-index: 200;
   position: fixed;
   width: 80vw;
-  max-width: 800px;
+  max-width: 1000px;
   padding-bottom: 2vw;
   background-color: ${(props) => props.theme.bgColor.active};
-  top: 100px;
+  top: 10%;
   left: 0;
   right: 0;
   margin: 0 auto;
@@ -24,23 +24,26 @@ const DetailContainer = styled(motion.div)`
   h3 {
     padding-top: 20px;
     line-height: 1.4;
-    font-size: 1.5vw;
+    font-size: 28px;
     text-align: center;
     font-weight: 600;
   }
   h4 {
     line-height: 1.4;
-    font-size: 0.8vw;
+    font-size: 18px;
     text-align: center;
   }
   p {
     padding-top: 20px;
     line-height: 1.4;
-    font-size: 0.8vw;
+    font-size: 16px;
   }
 `;
 
 const DetailText = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
   padding: 0 1.4vw;
 `;
 
@@ -91,7 +94,7 @@ interface iDetail {
   vote_count: number;
 }
 
-function Detail({ title, movieId }: detailProps) {
+function MovieDetail({ title, movieId }: detailProps) {
   const { data } = useQuery<iDetail>([movieId, "movieDetail"], () =>
     fetchMovieDetail(movieId)
   );
@@ -120,4 +123,4 @@ function Detail({ title, movieId }: detailProps) {
   );
 }
 
-export default Detail;
+export default MovieDetail;

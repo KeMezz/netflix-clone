@@ -30,3 +30,15 @@ export const fetchMovieDetail = (movieId?: number) => {
     `${BASE_URL}/movie/${movieId}?api_key=${API_KEY}&language=ko`
   ).then((response) => response.json());
 };
+
+export const fetchPopularTvshows = () => {
+  return fetch(
+    `${BASE_URL}/tv/popular?api_key=${API_KEY}&language=ko&page=1`
+  ).then((response) => response.json());
+};
+
+export const fetchTvDetail = (tvId?: number) => {
+  return fetch(`${BASE_URL}/tv/${tvId}?api_key=${API_KEY}&language=ko`).then(
+    (response) => response.json()
+  );
+};

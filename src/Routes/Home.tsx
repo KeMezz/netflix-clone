@@ -2,11 +2,11 @@ import { useQuery } from "react-query";
 import styled from "styled-components";
 import {
   fetchNowPlayingMovie,
-  fetchPopularMovie,
-  fetchTopRatedMovie,
-  fetchUpcomingMovie,
+  // fetchPopularMovie,
+  // fetchTopRatedMovie,
+  // fetchUpcomingMovie,
 } from "../api";
-import Slider from "../Components/Slider";
+import MovieSlider from "../Components/MovieSlider";
 import { makeImgPath } from "../imgPath";
 
 export interface iResults {
@@ -24,7 +24,7 @@ export interface iResults {
   vote_average: number;
   vote_count: number;
 }
-export interface iData {
+export interface iMovieData {
   results: [iResults];
 }
 
@@ -68,19 +68,15 @@ const BannerBox = styled.div`
 
 function Home() {
   const { isLoading: nowPlayingLoading, data: nowPlayingData } =
-    useQuery<iData>("nowPlaying", fetchNowPlayingMovie);
-  const { isLoading: popularLoading, data: popularData } = useQuery<iData>(
-    "latest",
-    fetchPopularMovie
-  );
-  const { isLoading: topRatedLoading, data: topRatedData } = useQuery<iData>(
-    "topRated",
-    fetchTopRatedMovie
-  );
-  const { isLoading: upcomingLoading, data: upcomingData } = useQuery<iData>(
-    "upcoming",
-    fetchUpcomingMovie
-  );
+    useQuery<iMovieData>("nowPlaying", fetchNowPlayingMovie);
+  // const { isLoading: popularLoading, data: popularData } = useQuery<iMovieData>(
+  //   "latest",
+  //   fetchPopularMovie
+  // );
+  // const { isLoading: topRatedLoading, data: topRatedData } =
+  //   useQuery<iMovieData>("topRated", fetchTopRatedMovie);
+  // const { isLoading: upcomingLoading, data: upcomingData } =
+  //   useQuery<iMovieData>("upcoming", fetchUpcomingMovie);
   return (
     <Container>
       <Banner
@@ -98,7 +94,7 @@ function Home() {
           </BannerBox>
         )}
       </Banner>
-      <Slider
+      <MovieSlider
         loading={nowPlayingLoading}
         data={nowPlayingData}
         title="현재 상영 중"
@@ -107,13 +103,13 @@ function Home() {
         loading={popularLoading}
         data={popularData}
         title="지금 가장 인기있는 영화"
-      />
-      <Slider
+      /> */}
+      {/* <Slider
         loading={topRatedLoading}
         data={topRatedData}
         title="높은 평점을 받은 작품들"
-      />
-      <Slider
+      /> */}
+      {/* <Slider
         loading={upcomingLoading}
         data={upcomingData}
         title="출시 예정작"

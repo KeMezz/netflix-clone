@@ -3,12 +3,12 @@ import { useState } from "react";
 import { useMatch, useNavigate, useParams } from "react-router-dom";
 import styled from "styled-components";
 import { makeImgPath } from "../imgPath";
-import { iData } from "../Routes/Home";
-import Detail from "./Detail";
+import { iTvData } from "../Routes/Tv";
+import TvDetail from "./TvDetail";
 
 interface sliderProps {
   loading: boolean;
-  data?: iData;
+  data?: iTvData;
   title: string;
 }
 
@@ -174,7 +174,7 @@ const slideInfoBoxVariants: Variants = {
   },
 };
 
-function Slider({ loading, data, title }: sliderProps) {
+function TvSlider({ loading, data, title }: sliderProps) {
   let offset = 6;
   const [index, setIndex] = useState(0);
   const [right, setRight] = useState(true);
@@ -186,11 +186,11 @@ function Slider({ loading, data, title }: sliderProps) {
     setRight(false);
     setIndex((prev) => (index === 0 ? 2 : prev - 1));
   };
-  const detailMatch = useMatch("/movie/:movieId");
+  const detailMatch = useMatch("/tv/:tvId");
   const navigate = useNavigate();
-  const showDetail = (movieId: number) => navigate(`/movie/${movieId}`);
-  const { movieId } = useParams();
-  const onOverlayClick = () => navigate("/");
+  const showDetail = (tvId: number) => navigate(`/tv/${tvId}`);
+  const { tvId } = useParams();
+  const onOverlayClick = () => navigate("/tv");
   return (
     <>
       <SlideTitle>{loading ? "불러오는 중..." : title}</SlideTitle>
@@ -220,19 +220,13 @@ function Slider({ loading, data, title }: sliderProps) {
                   bgPhoto={makeImgPath(item.backdrop_path || "", "w500")}
                   onClick={() => showDetail(item.id)}
                 >
-                  {/* <div> */}
-                  {/* <img
-                      src={makeImgPath(item.backdrop_path || "", "w500")}
-                      alt={item.title}
-                    /> */}
                   <SlideBoxWrapper>
                     <SlideInfoBox variants={slideInfoBoxVariants}>
-                      <h4>{item.title}</h4>
-                      <h5>{item.original_title}</h5>
+                      <h4>{item.name}</h4>
+                      <h5>{item.original_name}</h5>
                       <p>⭐️{item.vote_average}</p>
                     </SlideInfoBox>
                   </SlideBoxWrapper>
-                  {/* </div> */}
                 </SlideBox>
               ))}
           </SlideRow>
@@ -242,7 +236,7 @@ function Slider({ loading, data, title }: sliderProps) {
       {detailMatch ? (
         <>
           <AnimatePresence>
-            <Detail title={title} movieId={Number(movieId)} key={movieId} />
+            <TvDetail title={title} tvId={Number(tvId)} key={tvId} />
             <Overlay
               key="overlay"
               initial={{ opacity: 0 }}
@@ -257,4 +251,4 @@ function Slider({ loading, data, title }: sliderProps) {
   );
 }
 
-export default Slider;
+export default TvSlider;
