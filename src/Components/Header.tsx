@@ -68,10 +68,11 @@ function Header() {
   const navigate = useNavigate();
   const homeMatch = useMatch("/");
   const tvMatch = useMatch("/tv");
-  const { register, handleSubmit } = useForm<iSearchForm>();
+  const { register, handleSubmit, setValue } = useForm<iSearchForm>();
   const { scrollY } = useViewportScroll();
   const onSearchValid = ({ search }: iSearchForm) => {
-    console.log(search);
+    navigate(`/search/${search}`);
+    setValue("search", "");
   };
   const [searchOpen, setSearchOpen] = useRecoilState(searchState);
   const headerAnimation = useAnimation();

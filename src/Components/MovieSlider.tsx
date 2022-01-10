@@ -4,7 +4,7 @@ import { useMatch, useNavigate, useParams } from "react-router-dom";
 import styled from "styled-components";
 import { makeImgPath } from "../imgPath";
 import { iMovieData } from "../Routes/Home";
-import Detail from "./MovieDetail";
+import MovieDetail from "./MovieDetail";
 
 interface sliderProps {
   loading: boolean;
@@ -81,14 +81,6 @@ const SlideBox = styled(motion.div)<{ bgPhoto: string }>`
   &:last-child {
     transform-origin: right center;
   }
-  /* img {
-    left: 0;
-    top: 0;
-    object-fit: cover;
-    position: absolute;
-    z-index: -1;
-    width: 100%;
-  } */
 `;
 
 const SlideBoxWrapper = styled.div`
@@ -236,7 +228,11 @@ function MovieSlider({ loading, data, title }: sliderProps) {
       {detailMatch ? (
         <>
           <AnimatePresence>
-            <Detail title={title} movieId={Number(movieId)} key={movieId} />
+            <MovieDetail
+              title={title}
+              movieId={Number(movieId)}
+              key={movieId}
+            />
             <Overlay
               key="overlay"
               initial={{ opacity: 0 }}

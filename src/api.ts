@@ -42,3 +42,9 @@ export const fetchTvDetail = (tvId?: number) => {
     (response) => response.json()
   );
 };
+
+export const fetchSearchResults = (keywords?: string) => {
+  return fetch(
+    `${BASE_URL}/search/multi?api_key=${API_KEY}&language=ko&query=${keywords}&page=1&include_adult=%08true`
+  ).then((response) => response.json());
+};

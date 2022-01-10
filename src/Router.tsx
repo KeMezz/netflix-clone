@@ -13,7 +13,9 @@ function Router() {
         <Route path="/movie/:movieId" element={<Home />} />
         <Route path="/tv" element={<Tv />} />
         <Route path="/tv/:tvId" element={<Tv />} />
-        <Route path="/search" element={<Search />} />
+        <Route path="/search/:keyword" element={<Search />} />
+        <Route path="/search/:keyword/movie/:movieId" element={<Search />} />
+        <Route path="/search/:keyword/tv/:tvId" element={<Search />} />
       </Routes>
     </BrowserRouter>
   );

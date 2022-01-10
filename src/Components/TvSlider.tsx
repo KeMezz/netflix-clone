@@ -81,14 +81,6 @@ const SlideBox = styled(motion.div)<{ bgPhoto: string }>`
   &:last-child {
     transform-origin: right center;
   }
-  /* img {
-    left: 0;
-    top: 0;
-    object-fit: cover;
-    position: absolute;
-    z-index: -1;
-    width: 100%;
-  } */
 `;
 
 const SlideBoxWrapper = styled.div`

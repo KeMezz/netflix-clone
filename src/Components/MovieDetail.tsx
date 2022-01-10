@@ -61,6 +61,7 @@ const Genres = styled.div`
   padding-top: 1.6vw;
   justify-content: center;
   gap: 0.4vw;
+  text-align: center;
 `;
 
 const Genre = styled.div`

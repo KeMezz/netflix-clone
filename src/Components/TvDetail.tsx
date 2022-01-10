@@ -69,6 +69,7 @@ const Genre = styled.div`
   width: fit-content;
   border-radius: 12px;
   font-size: 0.8vw;
+  text-align: center;
 `;
 
 interface detailProps {
