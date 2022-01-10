@@ -8,10 +8,10 @@ const DetailContainer = styled(motion.div)`
   z-index: 200;
   position: fixed;
   width: 80vw;
-  max-width: 1000px;
+  max-width: 800px;
+  top: 5%;
   padding-bottom: 2vw;
   background-color: ${(props) => props.theme.bgColor.active};
-  top: 10%;
   left: 0;
   right: 0;
   margin: 0 auto;
@@ -119,10 +119,9 @@ function TvDetail({ title, tvId }: detailProps) {
   );
   return (
     <DetailContainer layoutId={title + tvId}>
-      <motion.img
-        src={makeImgPath(data?.backdrop_path || "")}
-        alt={data?.name}
-      />
+      {data?.backdrop_path ? (
+        <motion.img src={makeImgPath(data?.backdrop_path)} alt={data?.name} />
+      ) : null}
       <DetailText>
         <h3>{data?.name}</h3>
         <h4>{data?.original_name}</h4>

@@ -140,7 +140,7 @@ function Header() {
             autoComplete="off"
             autoSave="off"
             autoCorrect="off"
-            placeholder="제목, 사람, 장르..."
+            placeholder="검색어 입력..."
             {...register("search", { required: true })}
           />
           <SearchBtn

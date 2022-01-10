@@ -8,10 +8,10 @@ const DetailContainer = styled(motion.div)`
   z-index: 200;
   position: fixed;
   width: 80vw;
-  max-width: 1000px;
+  max-width: 800px;
+  top: 5%;
   padding-bottom: 2vw;
   background-color: ${(props) => props.theme.bgColor.active};
-  top: 10%;
   left: 0;
   right: 0;
   margin: 0 auto;
@@ -101,10 +101,9 @@ function MovieDetail({ title, movieId }: detailProps) {
   );
   return (
     <DetailContainer layoutId={title + movieId}>
-      <motion.img
-        src={makeImgPath(data?.backdrop_path || "")}
-        alt={data?.title}
-      />
+      {data?.backdrop_path ? (
+        <motion.img src={makeImgPath(data?.backdrop_path)} alt={data?.title} />
+      ) : null}
       <DetailText>
         <h3>{data?.title}</h3>
         <h4>{data?.original_title}</h4>
