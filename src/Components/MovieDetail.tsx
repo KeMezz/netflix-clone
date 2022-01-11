@@ -4,14 +4,19 @@ import styled from "styled-components";
 import { fetchMovieDetail } from "../api";
 import { makeImgPath } from "../imgPath";
 
-const DetailContainer = styled(motion.div)`
+export const DetailContainer = styled(motion.div)`
   z-index: 200;
   position: fixed;
   width: 80vw;
   max-width: 800px;
-  top: 5%;
+  min-height: 50vh;
+  top: 10%;
   padding-bottom: 2vw;
   background-color: ${(props) => props.theme.bgColor.active};
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
   left: 0;
   right: 0;
   margin: 0 auto;
@@ -40,14 +45,18 @@ const DetailContainer = styled(motion.div)`
   }
 `;
 
-const DetailText = styled.div`
+export const NoImages = styled.div`
+  padding: 150px;
+`;
+
+export const DetailText = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: space-evenly;
   padding: 0 1.4vw;
 `;
 
-const Credits = styled.div`
+export const Credits = styled.div`
   display: flex;
   justify-content: center;
   gap: 1vw;
@@ -56,7 +65,7 @@ const Credits = styled.div`
   }
 `;
 
-const Genres = styled.div`
+export const Genres = styled.div`
   display: flex;
   padding-top: 1.6vw;
   justify-content: center;
@@ -64,7 +73,7 @@ const Genres = styled.div`
   text-align: center;
 `;
 
-const Genre = styled.div`
+export const Genre = styled.div`
   padding: 4px 12px;
   background-color: crimson;
   width: fit-content;
@@ -77,7 +86,7 @@ interface detailProps {
   movieId?: number;
 }
 
-interface iDetail {
+interface iMovieDetail {
   backdrop_path: string;
   genres: [{ id: number; name: string }];
   homepage: string;
@@ -96,25 +105,31 @@ interface iDetail {
 }
 
 function MovieDetail({ title, movieId }: detailProps) {
-  const { data } = useQuery<iDetail>([movieId, "movieDetail"], () =>
-    fetchMovieDetail(movieId)
+  const { data: movieData } = useQuery<iMovieDetail>(
+    [movieId, "movieDetail"],
+    () => fetchMovieDetail(movieId)
   );
   return (
     <DetailContainer layoutId={title + movieId}>
-      {data?.backdrop_path ? (
-        <motion.img src={makeImgPath(data?.backdrop_path)} alt={data?.title} />
-      ) : null}
+      {movieData?.backdrop_path ? (
+        <motion.img
+          src={makeImgPath(movieData?.backdrop_path)}
+          alt={movieData?.title}
+        />
+      ) : (
+        <NoImages>이미지가 없습니다</NoImages>
+      )}
       <DetailText>
-        <h3>{data?.title}</h3>
-        <h4>{data?.original_title}</h4>
-        <p>{data?.overview}</p>
+        <h3>{movieData?.title}</h3>
+        <h4>{movieData?.original_title}</h4>
+        <p>{movieData?.overview}</p>
         <Credits>
-          {data?.production_companies.map((item) => (
+          {movieData?.production_companies.map((item) => (
             <p key={item.name}>{item.name}</p>
           ))}
         </Credits>
         <Genres>
-          {data?.genres.map((item) => (
+          {movieData?.genres.map((item) => (
             <Genre key={item.name}>{item.name}</Genre>
           ))}
         </Genres>

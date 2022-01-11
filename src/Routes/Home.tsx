@@ -1,11 +1,6 @@
 import { useQuery } from "react-query";
 import styled from "styled-components";
-import {
-  fetchNowPlayingMovie,
-  // fetchPopularMovie,
-  // fetchTopRatedMovie,
-  // fetchUpcomingMovie,
-} from "../api";
+import { fetchNowPlayingMovie } from "../api";
 import MovieSlider from "../Components/MovieSlider";
 import { makeImgPath } from "../imgPath";
 
@@ -69,14 +64,6 @@ const BannerBox = styled.div`
 function Home() {
   const { isLoading: nowPlayingLoading, data: nowPlayingData } =
     useQuery<iMovieData>("nowPlaying", fetchNowPlayingMovie);
-  // const { isLoading: popularLoading, data: popularData } = useQuery<iMovieData>(
-  //   "latest",
-  //   fetchPopularMovie
-  // );
-  // const { isLoading: topRatedLoading, data: topRatedData } =
-  //   useQuery<iMovieData>("topRated", fetchTopRatedMovie);
-  // const { isLoading: upcomingLoading, data: upcomingData } =
-  //   useQuery<iMovieData>("upcoming", fetchUpcomingMovie);
   return (
     <Container>
       <Banner
@@ -99,21 +86,6 @@ function Home() {
         data={nowPlayingData}
         title="현재 상영 중"
       />
-      {/* <Slider
-        loading={popularLoading}
-        data={popularData}
-        title="지금 가장 인기있는 영화"
-      /> */}
-      {/* <Slider
-        loading={topRatedLoading}
-        data={topRatedData}
-        title="높은 평점을 받은 작품들"
-      /> */}
-      {/* <Slider
-        loading={upcomingLoading}
-        data={upcomingData}
-        title="출시 예정작"
-      /> */}
     </Container>
   );
 }

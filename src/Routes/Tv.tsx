@@ -1,7 +1,6 @@
 import { useQuery } from "react-query";
 import styled from "styled-components";
 import { fetchPopularTvshows } from "../api";
-import Slider from "../Components/MovieSlider";
 import TvSlider from "../Components/TvSlider";
 import { makeImgPath } from "../imgPath";
 

@@ -4,6 +4,7 @@ import { useMatch, useNavigate, useParams } from "react-router-dom";
 import styled from "styled-components";
 import { fetchSearchResults } from "../api";
 import MovieDetail from "../Components/MovieDetail";
+import { Overlay } from "../Components/MovieSlider";
 import TvDetail from "../Components/TvDetail";
 import { makeImgPath } from "../imgPath";
 
@@ -31,9 +32,6 @@ const Result = styled(motion.div)<{ bgPhoto: string }>`
   height: 15vh;
   font-size: 0.9vw;
   font-weight: 600;
-  background: linear-gradient(rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.5)),
-    url(${(props) => props.bgPhoto});
-  background-size: cover;
   background-position: center;
   cursor: pointer;
 `;
@@ -42,7 +40,8 @@ const ResultWrapper = styled.div`
   width: 100%;
   height: 100%;
   display: flex;
-  align-items: flex-end;
+  justify-content: center;
+  align-items: center;
   padding: 0.6vw;
   position: relative;
 `;
@@ -66,17 +65,6 @@ const ResultInfoBox = styled(motion.div)`
     margin-top: 10px;
     font-size: 0.2vw;
   }
-`;
-
-const Overlay = styled(motion.div)`
-  background-color: rgba(0, 0, 0, 0.3);
-  position: fixed;
-  left: 0;
-  top: 0;
-  width: 100vw;
-  height: 100vh;
-  z-index: 50;
-  opacity: 0;
 `;
 
 interface iResultsData {
@@ -161,6 +149,13 @@ function Search() {
             data?.results.map((result) => (
               <AnimatePresence>
                 <Result
+                  style={{
+                    background: result.backdrop_path
+                      ? `linear-gradient(rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.5)),
+                  url(${makeImgPath(result.backdrop_path, "w500")})`
+                      : "#000",
+                    backgroundSize: "cover",
+                  }}
                   layoutId={"검색결과" + result.id}
                   variants={resultVariants}
                   transition={{ type: "tween" }}
@@ -174,6 +169,7 @@ function Search() {
                   }
                 >
                   <ResultWrapper>
+                    {result.backdrop_path ? null : "이미지가 없습니다"}
                     <ResultInfoBox variants={resultInfoVariants}>
                       <h4>
                         {result.media_type === "movie"

@@ -12,7 +12,7 @@ interface sliderProps {
   title: string;
 }
 
-const SlideTitle = styled.h3`
+export const SlideTitle = styled.h3`
   font-size: 1.2vw;
   padding-left: 50px;
   padding-bottom: 1vw;
@@ -22,7 +22,7 @@ const SlideTitle = styled.h3`
   }
 `;
 
-const SlideContainer = styled.section`
+export const SlideContainer = styled.section`
   width: 100vw;
   height: 8vw;
   position: relative;
@@ -55,7 +55,7 @@ const SlideContainer = styled.section`
     right: 0;
   }
 `;
-const SlideRow = styled(motion.div)`
+export const SlideRow = styled(motion.div)`
   position: absolute;
   width: 100vw;
   display: grid;
@@ -66,7 +66,7 @@ const SlideRow = styled(motion.div)`
     padding: 0 18px;
   }
 `;
-const SlideBox = styled(motion.div)<{ bgPhoto: string }>`
+export const SlideBox = styled(motion.div)<{ bgPhoto: string }>`
   height: 8vw;
   font-size: 0.9vw;
   font-weight: 600;
@@ -83,7 +83,7 @@ const SlideBox = styled(motion.div)<{ bgPhoto: string }>`
   }
 `;
 
-const SlideBoxWrapper = styled.div`
+export const SlideBoxWrapper = styled.div`
   width: 100%;
   height: 100%;
   display: flex;
@@ -92,7 +92,7 @@ const SlideBoxWrapper = styled.div`
   position: relative;
 `;
 
-const SlideInfoBox = styled(motion.div)`
+export const SlideInfoBox = styled(motion.div)`
   pointer-events: none;
   opacity: 0;
   width: 100%;
@@ -114,7 +114,7 @@ const SlideInfoBox = styled(motion.div)`
   }
 `;
 
-const Overlay = styled(motion.div)`
+export const Overlay = styled(motion.div)`
   background-color: rgba(0, 0, 0, 0.3);
   position: fixed;
   left: 0;
@@ -125,7 +125,7 @@ const Overlay = styled(motion.div)`
   opacity: 0;
 `;
 
-const slideRowVariants: Variants = {
+export const slideRowVariants: Variants = {
   initial: (right) => ({
     x: right ? window.outerWidth : -window.outerWidth,
   }),
@@ -137,7 +137,7 @@ const slideRowVariants: Variants = {
   }),
 };
 
-const slideBoxVariants: Variants = {
+export const slideBoxVariants: Variants = {
   initial: {
     scale: 1,
   },
@@ -152,7 +152,7 @@ const slideBoxVariants: Variants = {
   },
 };
 
-const slideInfoBoxVariants: Variants = {
+export const slideInfoBoxVariants: Variants = {
   initial: {
     opacity: 0,
   },
