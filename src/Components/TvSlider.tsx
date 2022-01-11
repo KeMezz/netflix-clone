@@ -106,11 +106,11 @@ const SlideInfoBox = styled(motion.div)`
     font-size: 0.8vw;
   }
   h5 {
-    font-size: 0.2vw;
+    font-size: 10px;
   }
   p {
     margin-top: 10px;
-    font-size: 0.2vw;
+    font-size: 8px;
   }
 `;
 
