@@ -4,7 +4,11 @@ import { useMatch, useNavigate, useParams } from "react-router-dom";
 import styled from "styled-components";
 import { fetchSearchResults } from "../api";
 import MovieDetail from "../Components/MovieDetail";
-import { Overlay } from "../Components/MovieSlider";
+import {
+  Overlay,
+  SlideInfoBox,
+  slideInfoBoxVariants,
+} from "../Components/MovieSlider";
 import TvDetail from "../Components/TvDetail";
 import { makeImgPath } from "../imgPath";
 
@@ -28,7 +32,7 @@ const NoResults = styled.div`
   display: flex;
   justify-content: center;
 `;
-const Result = styled(motion.div)<{ bgPhoto: string }>`
+const Result = styled(motion.div)`
   height: 15vh;
   font-size: 0.9vw;
   font-weight: 600;
@@ -44,27 +48,6 @@ const ResultWrapper = styled.div`
   align-items: center;
   padding: 0.6vw;
   position: relative;
-`;
-const ResultInfoBox = styled(motion.div)`
-  pointer-events: none;
-  opacity: 0;
-  width: 100%;
-  background-color: ${(props) => props.theme.bgColor.active};
-  padding: 0.8vw;
-  position: absolute;
-  top: 100%;
-  left: 0;
-  line-height: 1.5;
-  h4 {
-    font-size: 0.8vw;
-  }
-  h5 {
-    font-size: 0.2vw;
-  }
-  p {
-    margin-top: 10px;
-    font-size: 0.2vw;
-  }
 `;
 
 interface iResultsData {
@@ -101,20 +84,6 @@ const resultVariants: Variants = {
     scale: 1.3,
     y: -50,
     boxShadow: "0 0 10px rgba(0,0,0,0.5)",
-    transition: {
-      delay: 0.8,
-      duration: 0.3,
-    },
-  },
-};
-
-const resultInfoVariants: Variants = {
-  initial: {
-    opacity: 0,
-  },
-  hover: {
-    opacity: 1,
-    pointerEvents: "auto",
     transition: {
       delay: 0.8,
       duration: 0.3,
@@ -161,7 +130,6 @@ function Search() {
                   transition={{ type: "tween" }}
                   initial="initial"
                   whileHover="hover"
-                  bgPhoto={makeImgPath(result.backdrop_path || "", "w500")}
                   onClick={() =>
                     result.media_type === "movie"
                       ? showMovieDetail(result.id)
@@ -170,7 +138,7 @@ function Search() {
                 >
                   <ResultWrapper>
                     {result.backdrop_path ? null : "이미지가 없습니다"}
-                    <ResultInfoBox variants={resultInfoVariants}>
+                    <SlideInfoBox variants={slideInfoBoxVariants}>
                       <h4>
                         {result.media_type === "movie"
                           ? result.title
@@ -182,7 +150,7 @@ function Search() {
                           : result.original_name}
                       </h5>
                       <p>⭐️{result.vote_average}</p>
-                    </ResultInfoBox>
+                    </SlideInfoBox>
                   </ResultWrapper>
                 </Result>
               </AnimatePresence>
