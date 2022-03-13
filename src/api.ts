@@ -61,8 +61,14 @@ export const fetchTvDetail = (tvId?: number) => {
   );
 };
 
-export const fetchSearchResults = (keywords?: string) => {
+export const fetchSearchMovie = (keywords?: string) => {
   return fetch(
-    `${BASE_URL}/search/multi?api_key=${API_KEY}&language=ko&query=${keywords}&page=1&include_adult=%08true`
+    `${BASE_URL}/search/movie?api_key=${API_KEY}&language=ko&query=${keywords}&page=1&include_adult=false`
+  ).then((response) => response.json());
+};
+
+export const fetchSearchTv = (keywords?: string) => {
+  return fetch(
+    `${BASE_URL}/search/tv?api_key=${API_KEY}&language=ko&query=${keywords}&page=1&include_adult=%08false`
   ).then((response) => response.json());
 };

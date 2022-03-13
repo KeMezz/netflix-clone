@@ -1,15 +1,17 @@
 import { AnimatePresence, motion, Variants } from "framer-motion";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useMatch, useNavigate, useParams } from "react-router-dom";
 import styled from "styled-components";
 import { makeImgPath } from "../imgPath";
-import { iMovieData } from "../Routes/Home";
+import { iSearchResults } from "../Routes/Search";
 import MovieDetail from "./MovieDetail";
+import TvDetail from "./TvDetail";
 
 interface sliderProps {
   loading: boolean;
-  data?: iMovieData;
+  data?: iSearchResults;
   title: string;
+  keyword?: string;
 }
 
 export const SlideTitle = styled.h3`
@@ -166,8 +168,7 @@ export const slideInfoBoxVariants: Variants = {
   },
 };
 
-function MovieSlider({ loading, data, title }: sliderProps) {
-  useEffect(() => console.log(data), [loading]);
+function SearchTvSlider({ data, title, keyword }: sliderProps) {
   let offset = 6;
   const [index, setIndex] = useState(0);
   const [right, setRight] = useState(true);
@@ -179,14 +180,16 @@ function MovieSlider({ loading, data, title }: sliderProps) {
     setRight(false);
     setIndex((prev) => (index === 0 ? 2 : prev - 1));
   };
-  const detailMatch = useMatch("/movie/:movieId");
+  const tvDetailMatch = useMatch(`/search/:keyword/tv/:tvId`);
   const navigate = useNavigate();
-  const showDetail = (movieId: number) => navigate(`/movie/${movieId}`);
-  const { movieId } = useParams();
+  const showTvDetail = (tvId: number) => {
+    navigate(`/search/${keyword}/tv/${tvId}`);
+  };
+  const { tvId } = useParams();
   const onOverlayClick = () => navigate(-1);
   return (
     <>
-      <SlideTitle>{loading ? "불러오는 중..." : title}</SlideTitle>
+      <SlideTitle>{title}</SlideTitle>
       <SlideContainer>
         <i className="fas fa-chevron-left" onClick={decreaseIndex}></i>
         <AnimatePresence initial={false} custom={right}>
@@ -200,7 +203,6 @@ function MovieSlider({ loading, data, title }: sliderProps) {
             exit="exit"
           >
             {data?.results
-              .slice(1)
               .slice(offset * index, offset * index + offset)
               .map((item) => (
                 <SlideBox
@@ -211,7 +213,7 @@ function MovieSlider({ loading, data, title }: sliderProps) {
                   initial="initial"
                   whileHover="hover"
                   bgPhoto={makeImgPath(item.backdrop_path || "", "w500")}
-                  onClick={() => showDetail(item.id)}
+                  onClick={() => showTvDetail(item.id)}
                 >
                   <SlideBoxWrapper>
                     <SlideInfoBox variants={slideInfoBoxVariants}>
@@ -226,14 +228,10 @@ function MovieSlider({ loading, data, title }: sliderProps) {
         </AnimatePresence>
         <i className="fas fa-chevron-right" onClick={increaseIndex}></i>
       </SlideContainer>
-      {detailMatch ? (
+      {tvDetailMatch && (
         <>
           <AnimatePresence>
-            <MovieDetail
-              title={title}
-              movieId={Number(movieId)}
-              key={movieId}
-            />
+            <TvDetail title={title} tvId={Number(tvId)} key={tvId} />
             <Overlay
               key="overlay"
               initial={{ opacity: 0 }}
@@ -243,9 +241,9 @@ function MovieSlider({ loading, data, title }: sliderProps) {
             />
           </AnimatePresence>
         </>
-      ) : null}
+      )}
     </>
   );
 }
 
-export default MovieSlider;
+export default SearchTvSlider;

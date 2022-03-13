@@ -39,7 +39,7 @@ function TvLatestSlider({ loading, data, title }: sliderProps) {
   const navigate = useNavigate();
   const showDetail = (tvId: number) => navigate(`/tv/${tvId}`);
   const { tvId } = useParams();
-  const onOverlayClick = () => navigate("/tv");
+  const onOverlayClick = () => navigate(-1);
   return (
     <>
       <SlideTitle>{loading ? "불러오는 중..." : title}</SlideTitle>
