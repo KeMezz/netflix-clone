@@ -137,7 +137,7 @@ function Search() {
                   }
                 >
                   <ResultWrapper>
-                    {result.backdrop_path ? null : "이미지가 없습니다"}
+                    {result.backdrop_path ? null : "No Images"}
                     <SlideInfoBox variants={slideInfoBoxVariants}>
                       <h4>
                         {result.media_type === "movie"

@@ -64,7 +64,7 @@ function TvDetail({ title, tvId }: detailProps) {
           alt={tvData?.name}
         />
       ) : (
-        <NoImages>이미지가 없습니다</NoImages>
+        <NoImages>No Images</NoImages>
       )}
       <DetailText>
         <h3>{tvData?.name}</h3>

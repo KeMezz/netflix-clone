@@ -1,6 +1,11 @@
 import { useQuery } from "react-query";
 import styled from "styled-components";
-import { fetchNowPlayingMovie } from "../api";
+import {
+  fetchLatestMovie,
+  fetchNowPlayingMovie,
+  fetchTopRatedMovie,
+  fetchUpcomingMovie,
+} from "../api";
 import MovieSlider from "../Components/MovieSlider";
 import { makeImgPath } from "../imgPath";
 
@@ -63,7 +68,13 @@ const BannerBox = styled.div`
 
 function Home() {
   const { isLoading: nowPlayingLoading, data: nowPlayingData } =
-    useQuery<iMovieData>("nowPlaying", fetchNowPlayingMovie);
+    useQuery<iMovieData>("nowPlayingMovie", fetchNowPlayingMovie);
+  const { isLoading: topRatedMovieLoading, data: topRatedMovie } =
+    useQuery<iMovieData>("topRatedMovie", fetchTopRatedMovie);
+  const { isLoading: upcomingMovieLoading, data: upcomingMovie } =
+    useQuery<iMovieData>("upcomingMovie", fetchUpcomingMovie);
+  const { isLoading: latestMovieLoading, data: latestMovie } =
+    useQuery<iMovieData>("upcomingMovie", fetchLatestMovie);
   return (
     <Container>
       <Banner
@@ -84,7 +95,22 @@ function Home() {
       <MovieSlider
         loading={nowPlayingLoading}
         data={nowPlayingData}
-        title="현재 상영 중"
+        title="Now Playing"
+      />
+      <MovieSlider
+        loading={latestMovieLoading}
+        data={latestMovie}
+        title="Latest"
+      />
+      <MovieSlider
+        loading={topRatedMovieLoading}
+        data={topRatedMovie}
+        title="Top Rated"
+      />
+      <MovieSlider
+        loading={upcomingMovieLoading}
+        data={upcomingMovie}
+        title="Upcoming"
       />
     </Container>
   );

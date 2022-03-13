@@ -117,7 +117,7 @@ function MovieDetail({ title, movieId }: detailProps) {
           alt={movieData?.title}
         />
       ) : (
-        <NoImages>이미지가 없습니다</NoImages>
+        <NoImages>No Images</NoImages>
       )}
       <DetailText>
         <h3>{movieData?.title}</h3>

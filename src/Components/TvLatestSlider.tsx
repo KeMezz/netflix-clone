@@ -1,8 +1,8 @@
 import { AnimatePresence } from "framer-motion";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useMatch, useNavigate, useParams } from "react-router-dom";
 import { makeImgPath } from "../imgPath";
-import { iTvData } from "../Routes/Tv";
+import { iResults } from "../Routes/Tv";
 import {
   Overlay,
   SlideBox,
@@ -19,11 +19,11 @@ import TvDetail from "./TvDetail";
 
 interface sliderProps {
   loading: boolean;
-  data?: iTvData;
+  data?: iResults;
   title: string;
 }
 
-function TvSlider({ loading, data, title }: sliderProps) {
+function TvLatestSlider({ loading, data, title }: sliderProps) {
   let offset = 6;
   const [index, setIndex] = useState(0);
   const [right, setRight] = useState(true);
@@ -55,29 +55,24 @@ function TvSlider({ loading, data, title }: sliderProps) {
             transition={{ duration: 0.5 }}
             exit="exit"
           >
-            {data?.results
-              .slice(1)
-              .slice(offset * index, offset * index + offset)
-              .map((item) => (
-                <SlideBox
-                  layoutId={title + item.id}
-                  key={item.id}
-                  variants={slideBoxVariants}
-                  transition={{ type: "tween" }}
-                  initial="initial"
-                  whileHover="hover"
-                  bgPhoto={makeImgPath(item.backdrop_path || "", "w500")}
-                  onClick={() => showDetail(item.id)}
-                >
-                  <SlideBoxWrapper>
-                    <SlideInfoBox variants={slideInfoBoxVariants}>
-                      <h4>{item.name}</h4>
-                      <h5>{item.original_name}</h5>
-                      <p>⭐️{item.vote_average}</p>
-                    </SlideInfoBox>
-                  </SlideBoxWrapper>
-                </SlideBox>
-              ))}
+            <SlideBox
+              layoutId={title + data?.id}
+              key={data?.id}
+              variants={slideBoxVariants}
+              transition={{ type: "tween" }}
+              initial="initial"
+              whileHover="hover"
+              bgPhoto={makeImgPath(data?.backdrop_path || "", "w500")}
+              onClick={() => showDetail(Number(data?.id))}
+            >
+              <SlideBoxWrapper>
+                <SlideInfoBox variants={slideInfoBoxVariants}>
+                  <h4>{data?.name}</h4>
+                  <h5>{data?.original_name}</h5>
+                  <p>⭐️{data?.vote_average}</p>
+                </SlideInfoBox>
+              </SlideBoxWrapper>
+            </SlideBox>
           </SlideRow>
         </AnimatePresence>
         <i className="fas fa-chevron-right" onClick={increaseIndex}></i>
@@ -100,4 +95,4 @@ function TvSlider({ loading, data, title }: sliderProps) {
   );
 }
 
-export default TvSlider;
+export default TvLatestSlider;

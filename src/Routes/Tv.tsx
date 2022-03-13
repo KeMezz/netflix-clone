@@ -1,6 +1,12 @@
 import { useQuery } from "react-query";
 import styled from "styled-components";
-import { fetchPopularTvshows } from "../api";
+import {
+  fetchAiringToday,
+  fetchLatestTvShows,
+  fetchPopularTvshows,
+  fetchTopRatedShows,
+} from "../api";
+import TvLatestSlider from "../Components/TvLatestSlider";
 import TvSlider from "../Components/TvSlider";
 import { makeImgPath } from "../imgPath";
 
@@ -64,6 +70,12 @@ const BannerBox = styled.div`
 function Tv() {
   const { isLoading: popularTvLoading, data: popularTvData } =
     useQuery<iTvData>("popularTv", fetchPopularTvshows);
+  const { isLoading: airingTodayLoading, data: airingToday } =
+    useQuery<iTvData>("airingToday", fetchAiringToday);
+  const { isLoading: topRatedShowsLoading, data: topRatedShows } =
+    useQuery<iTvData>("topRatedShows", fetchTopRatedShows);
+  const { isLoading: latestTvShowsLoading, data: latestTvShows } =
+    useQuery<iResults>("latestTV", fetchLatestTvShows);
   return (
     <Container>
       <Banner
@@ -84,7 +96,22 @@ function Tv() {
       <TvSlider
         loading={popularTvLoading}
         data={popularTvData}
-        title="가장 인기 있는 TV 시리즈"
+        title="Popular"
+      />
+      <TvSlider
+        loading={airingTodayLoading}
+        data={airingToday}
+        title="Airing Today"
+      />
+      <TvSlider
+        loading={topRatedShowsLoading}
+        data={topRatedShows}
+        title="Top Rated"
+      />
+      <TvLatestSlider
+        loading={latestTvShowsLoading}
+        data={latestTvShows}
+        title="Latest TV Shows"
       />
     </Container>
   );

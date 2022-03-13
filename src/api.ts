@@ -7,9 +7,9 @@ export const fetchNowPlayingMovie = () => {
   ).then((response) => response.json());
 };
 
-export const fetchPopularMovie = () => {
+export const fetchLatestMovie = () => {
   return fetch(
-    `${BASE_URL}/movie/popular?api_key=${API_KEY}&language=ko&page=1`
+    `${BASE_URL}/movie/latest?api_key=${API_KEY}&language=ko&page=1`
   ).then((response) => response.json());
 };
 
@@ -34,6 +34,24 @@ export const fetchMovieDetail = (movieId?: number) => {
 export const fetchPopularTvshows = () => {
   return fetch(
     `${BASE_URL}/tv/popular?api_key=${API_KEY}&language=ko&page=1`
+  ).then((response) => response.json());
+};
+
+export const fetchLatestTvShows = () => {
+  return fetch(`${BASE_URL}/tv/latest?api_key=${API_KEY}&language=ko`).then(
+    (response) => response.json()
+  );
+};
+
+export const fetchAiringToday = () => {
+  return fetch(
+    `${BASE_URL}/tv/airing_today?api_key=${API_KEY}&language=ko&page=1`
+  ).then((response) => response.json());
+};
+
+export const fetchTopRatedShows = () => {
+  return fetch(
+    `${BASE_URL}/tv/top_rated?api_key=${API_KEY}&language=ko&page=1`
   ).then((response) => response.json());
 };
 
