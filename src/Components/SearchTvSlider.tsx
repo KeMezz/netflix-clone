@@ -4,7 +4,6 @@ import { useMatch, useNavigate, useParams } from "react-router-dom";
 import styled from "styled-components";
 import { makeImgPath } from "../imgPath";
 import { iSearchResults } from "../Routes/Search";
-import MovieDetail from "./MovieDetail";
 import TvDetail from "./TvDetail";
 
 interface sliderProps {

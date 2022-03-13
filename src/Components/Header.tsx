@@ -97,7 +97,7 @@ function Header() {
           headerAnimation.start({ backgroundColor: "rgba(0,0,0,0)" });
         }
       }),
-    [scrollY]
+    [scrollY, headerAnimation]
   );
   return (
     <Container

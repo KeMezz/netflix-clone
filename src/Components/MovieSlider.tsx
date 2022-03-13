@@ -1,5 +1,5 @@
 import { AnimatePresence, motion, Variants } from "framer-motion";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useMatch, useNavigate, useParams } from "react-router-dom";
 import styled from "styled-components";
 import { makeImgPath } from "../imgPath";
@@ -167,7 +167,6 @@ export const slideInfoBoxVariants: Variants = {
 };
 
 function MovieSlider({ loading, data, title }: sliderProps) {
-  useEffect(() => console.log(data), [loading]);
   let offset = 6;
   const [index, setIndex] = useState(0);
   const [right, setRight] = useState(true);
