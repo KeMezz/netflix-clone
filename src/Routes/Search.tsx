@@ -70,18 +70,22 @@ function Search() {
             <Loader>검색 중입니다...</Loader>
           ) : (
             <>
-              <SearchMovieSlider
-                keyword={keyword}
-                loading={isMovieResultLoading}
-                data={movieResultData}
-                title="Movie Results"
-              />
-              <SearchTvSlider
-                keyword={keyword}
-                loading={isTvResultLoading}
-                data={tvResultData}
-                title="TV Results"
-              />
+              {movieResultData?.total_results !== 0 && (
+                <SearchMovieSlider
+                  keyword={keyword}
+                  loading={isMovieResultLoading}
+                  data={movieResultData}
+                  title="Movie Results"
+                />
+              )}
+              {tvResultData?.total_results !== 0 && (
+                <SearchTvSlider
+                  keyword={keyword}
+                  loading={isTvResultLoading}
+                  data={tvResultData}
+                  title="TV Results"
+                />
+              )}
             </>
           )}
         </SearchResults>
