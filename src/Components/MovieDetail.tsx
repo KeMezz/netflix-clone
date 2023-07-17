@@ -1,4 +1,4 @@
-import { AnimatePresence, motion } from "framer-motion";
+import { motion } from "framer-motion";
 import { useQuery } from "react-query";
 import styled from "styled-components";
 import { fetchMovieDetail } from "../api";
