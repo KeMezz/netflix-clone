@@ -216,8 +216,8 @@ function SearchTvSlider({ data, title, keyword }: sliderProps) {
                 >
                   <SlideBoxWrapper>
                     <SlideInfoBox variants={slideInfoBoxVariants}>
-                      <h4>{item.title}</h4>
-                      <h5>{item.original_title}</h5>
+                      <h4>{item.name}</h4>
+                      <h5>{item.original_name}</h5>
                       <p>⭐️{item.vote_average}</p>
                     </SlideInfoBox>
                   </SlideBoxWrapper>
