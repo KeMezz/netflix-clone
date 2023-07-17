@@ -1,8 +1,9 @@
-import { motion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import { useQuery } from "react-query";
 import styled from "styled-components";
 import { fetchMovieDetail } from "../api";
 import { makeImgPath } from "../imgPath";
+import { useNavigate } from "react-router-dom";
 
 export const DetailContainer = styled(motion.div)`
   z-index: 200;
@@ -81,6 +82,29 @@ export const Genre = styled.div`
   font-size: 0.8vw;
 `;
 
+export const CloseBtn = styled.button`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 40px;
+  height: 40px;
+  background-color: rgba(255, 255, 255, 0.3);
+  border-radius: 20px;
+  position: absolute;
+  right: 12px;
+  top: 12px;
+  cursor: pointer;
+  transition: 0.3s;
+  &:hover {
+    background-color: #fff;
+    color: #333;
+  }
+  svg {
+    width: 30px;
+    height: 30px;
+  }
+`;
+
 interface detailProps {
   title: string;
   movieId?: number;
@@ -104,13 +128,34 @@ interface iMovieDetail {
   vote_count: number;
 }
 
-function MovieDetail({ title, movieId }: detailProps) {
+function MovieDetail({ movieId }: detailProps) {
   const { data: movieData } = useQuery<iMovieDetail>(
     [movieId, "movieDetail"],
     () => fetchMovieDetail(movieId)
   );
+  const navigate = useNavigate();
   return (
-    <DetailContainer layoutId={title + movieId}>
+    <DetailContainer
+      initial={{ opacity: 0, y: 100 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: 100 }}
+      transition={{ duration: 0.3 }}
+    >
+      <CloseBtn onClick={() => navigate(-1)}>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          strokeWidth={1.5}
+          stroke="currentColor"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            d="M6 18L18 6M6 6l12 12"
+          />
+        </svg>
+      </CloseBtn>
       {movieData?.backdrop_path ? (
         <motion.img
           src={makeImgPath(movieData?.backdrop_path)}

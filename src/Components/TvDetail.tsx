@@ -3,6 +3,7 @@ import { useQuery } from "react-query";
 import { fetchTvDetail } from "../api";
 import { makeImgPath } from "../imgPath";
 import {
+  CloseBtn,
   Credits,
   DetailContainer,
   DetailText,
@@ -10,6 +11,7 @@ import {
   Genres,
   NoImages,
 } from "./MovieDetail";
+import { useNavigate } from "react-router-dom";
 
 interface detailProps {
   title: string;
@@ -52,12 +54,33 @@ interface iTvDetail {
   ];
 }
 
-function TvDetail({ title, tvId }: detailProps) {
+function TvDetail({ tvId }: detailProps) {
   const { data: tvData } = useQuery<iTvDetail>([tvId, "tvDetail"], () =>
     fetchTvDetail(tvId)
   );
+  const navigate = useNavigate();
   return (
-    <DetailContainer layoutId={title + tvId}>
+    <DetailContainer
+      initial={{ opacity: 0, y: 100 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: 100 }}
+      transition={{ duration: 0.3 }}
+    >
+      <CloseBtn onClick={() => navigate(-1)}>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          strokeWidth={1.5}
+          stroke="currentColor"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            d="M6 18L18 6M6 6l12 12"
+          />
+        </svg>
+      </CloseBtn>
       {tvData?.backdrop_path ? (
         <motion.img
           src={makeImgPath(tvData?.backdrop_path)}
