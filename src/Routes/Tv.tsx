@@ -1,4 +1,6 @@
-import { useQuery } from "react-query";
+import { useTmdbQuery } from "../tmdb";
+import TmdbErrors from "../Components/TmdbErrors";
+import { useRecoilValue } from "recoil";
 import styled from "styled-components";
 import {
   fetchAiringToday,
@@ -6,6 +8,8 @@ import {
   fetchPopularTvshows,
   fetchTopRatedShows,
 } from "../api";
+import { apiSessionAtom } from "../atom";
+import ApiKeyNotice from "../Components/ApiKeyNotice";
 import TvLatestSlider from "../Components/TvLatestSlider";
 import TvSlider from "../Components/TvSlider";
 import { makeImgPath } from "../imgPath";
@@ -68,51 +72,63 @@ const BannerBox = styled.div`
 `;
 
 function Tv() {
-  const { isLoading: popularTvLoading, data: popularTvData } =
-    useQuery<iTvData>("popularTv", fetchPopularTvshows);
-  const { isLoading: airingTodayLoading, data: airingToday } =
-    useQuery<iTvData>("airingToday", fetchAiringToday);
-  const { isLoading: topRatedShowsLoading, data: topRatedShows } =
-    useQuery<iTvData>("topRatedShows", fetchTopRatedShows);
-  const { isLoading: latestTvShowsLoading, data: latestTvShows } =
-    useQuery<iResults>("latestTV", fetchLatestTvShows);
+  const { enabled } = useRecoilValue(apiSessionAtom);
+
+  const popularTvDataQuery = useTmdbQuery<iTvData>(["popularTv"], (signal) => fetchPopularTvshows(signal));
+  const { isLoading: popularTvLoading, data: popularTvData } = popularTvDataQuery;
+  const airingTodayQuery = useTmdbQuery<iTvData>(["airingToday"], (signal) => fetchAiringToday(signal));
+  const { isLoading: airingTodayLoading, data: airingToday } = airingTodayQuery;
+  const topRatedShowsQuery = useTmdbQuery<iTvData>(["topRatedShows"], (signal) => fetchTopRatedShows(signal));
+  const { isLoading: topRatedShowsLoading, data: topRatedShows } = topRatedShowsQuery;
+  const latestTvShowsQuery = useTmdbQuery<iResults>(["latestTV"], (signal) => fetchLatestTvShows(signal));
+  const { isLoading: latestTvShowsLoading, data: latestTvShows } = latestTvShowsQuery;
+
+  if (!enabled) {
+    return (
+      <Container>
+        <ApiKeyNotice />
+      </Container>
+    );
+  }
+
   return (
     <Container>
+      <TmdbErrors queries={[["Popular", popularTvDataQuery], ["Airing Today", airingTodayQuery], ["Top Rated", topRatedShowsQuery], ["Latest TV Shows", latestTvShowsQuery]]} />
       <Banner
-        bgPhoto={makeImgPath(popularTvData?.results[0].backdrop_path || "")}
+        bgPhoto={makeImgPath(popularTvData?.results?.[0]?.backdrop_path || "")}
       >
         {popularTvLoading ? (
           <BannerBox>
             <h1>불러오는 중...</h1>
           </BannerBox>
-        ) : (
+        ) : popularTvData ? (
           <BannerBox>
-            <h1>{popularTvData?.results[0].name}</h1>
+            <h1>{popularTvData?.results?.[0]?.name}</h1>
             <h2>현재 인기 TV 시리즈 1위</h2>
-            <h3>{popularTvData?.results[0].overview}</h3>
+            <h3>{popularTvData?.results?.[0]?.overview}</h3>
           </BannerBox>
-        )}
+        ) : null}
       </Banner>
-      <TvSlider
+      {popularTvData && <TvSlider
         loading={popularTvLoading}
         data={popularTvData}
         title="Popular"
-      />
-      <TvSlider
+      />}
+      {airingToday && <TvSlider
         loading={airingTodayLoading}
         data={airingToday}
         title="Airing Today"
-      />
-      <TvSlider
+      />}
+      {topRatedShows && <TvSlider
         loading={topRatedShowsLoading}
         data={topRatedShows}
         title="Top Rated"
-      />
-      <TvLatestSlider
+      />}
+      {latestTvShows && <TvLatestSlider
         loading={latestTvShowsLoading}
         data={latestTvShows}
         title="Latest TV Shows"
-      />
+      />}
     </Container>
   );
 }

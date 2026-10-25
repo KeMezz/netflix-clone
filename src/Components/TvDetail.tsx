@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
-import { useQuery } from "react-query";
 import { fetchTvDetail } from "../api";
+import { useTmdbQuery } from "../tmdb";
+import TmdbErrors from "./TmdbErrors";
 import { makeImgPath } from "../imgPath";
 import {
   CloseBtn,
@@ -55,9 +56,8 @@ interface iTvDetail {
 }
 
 function TvDetail({ tvId }: detailProps) {
-  const { data: tvData } = useQuery<iTvDetail>([tvId, "tvDetail"], () =>
-    fetchTvDetail(tvId)
-  );
+  const detailQuery = useTmdbQuery<iTvDetail>(["tvDetail", tvId], signal => fetchTvDetail(tvId, signal), Boolean(tvId));
+  const { data: tvData } = detailQuery;
   const navigate = useNavigate();
   return (
     <DetailContainer
@@ -66,6 +66,8 @@ function TvDetail({ tvId }: detailProps) {
       exit={{ opacity: 0, y: 100 }}
       transition={{ duration: 0.3 }}
     >
+      <TmdbErrors queries={[["tv detail", detailQuery]]} />
+      {detailQuery.isLoading && <p role="status">상세 정보를 불러오는 중...</p>}
       <CloseBtn onClick={() => navigate(-1)}>
         <svg
           xmlns="http://www.w3.org/2000/svg"

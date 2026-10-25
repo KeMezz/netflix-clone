@@ -1,6 +1,7 @@
 import { useRecoilValue } from "recoil";
 import styled, { createGlobalStyle, ThemeProvider } from "styled-components";
 import { windowSizeAtom } from "./atom";
+import { ApiSessionLifecycle } from "./tmdb";
 import Router from "./Router";
 import { darkTheme } from "./theme";
 import { useWindowSize } from "./useWindowSize";
@@ -49,6 +50,7 @@ function App() {
     <>
       <ThemeProvider theme={darkTheme}>
         <GlobalStyle />
+        <ApiSessionLifecycle />
         {windowSize.width > 1200 ? (
           <Router />
         ) : (
