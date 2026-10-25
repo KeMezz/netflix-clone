@@ -1,10 +1,10 @@
-import { useEffect } from "react";
-import { useQuery } from "react-query";
+import { useTmdbQuery } from "../tmdb";
+import TmdbErrors from "../Components/TmdbErrors";
 import { useParams } from "react-router-dom";
 import { useRecoilValue } from "recoil";
 import styled from "styled-components";
-import { fetchSearchMovie, fetchSearchTv, setApiKey } from "../api";
-import { apiKeyAtom } from "../atom";
+import { fetchSearchMovie, fetchSearchTv } from "../api";
+import { apiSessionAtom } from "../atom";
 import ApiKeyNotice from "../Components/ApiKeyNotice";
 import SearchMovieSlider from "../Components/SearchMovieSlider";
 import SearchTvSlider from "../Components/SearchTvSlider";
@@ -56,40 +56,29 @@ export interface iSearchResults {
 
 function Search() {
   const { keyword } = useParams();
-  const apiKey = useRecoilValue(apiKeyAtom);
+  const { enabled } = useRecoilValue(apiSessionAtom);
 
-  useEffect(() => {
-    setApiKey(apiKey);
-  }, [apiKey]);
+  const movieResultDataQuery = useTmdbQuery<iSearchResults>([keyword, "movieSearch"], (signal) => fetchSearchMovie(keyword, signal), Boolean(keyword));
+  const { isLoading: isMovieResultLoading, data: movieResultData } = movieResultDataQuery;
+  const tvResultDataQuery = useTmdbQuery<iSearchResults>([keyword, "tvSearch"], (signal) => fetchSearchTv(keyword, signal), Boolean(keyword));
+  const { isLoading: isTvResultLoading, data: tvResultData } = tvResultDataQuery;
 
-  const { isLoading: isMovieResultLoading, data: movieResultData } =
-    useQuery<iSearchResults>(
-      [keyword, "movieSearch", apiKey],
-      () => fetchSearchMovie(keyword, apiKey),
-      { enabled: Boolean(apiKey && keyword) }
-    );
-  const { isLoading: isTvResultLoading, data: tvResultData } =
-    useQuery<iSearchResults>(
-      [keyword, "tvSearch", apiKey],
-      () => fetchSearchTv(keyword, apiKey),
-      { enabled: Boolean(apiKey && keyword) }
-    );
-
-  if (!apiKey) {
+  if (!enabled) {
     return <ApiKeyNotice />;
   }
 
   return (
     <>
+      <TmdbErrors queries={[["Movie Results", movieResultDataQuery], ["TV Results", tvResultDataQuery]]} />
       {movieResultData?.total_results === 0 && tvResultData?.total_results === 0 ? (
         <NoResults>검색 결과가 없습니다</NoResults>
       ) : (
         <SearchResults>
           {isMovieResultLoading || isTvResultLoading ? (
             <Loader>검색 중입니다...</Loader>
-          ) : (
+          ) : null}
             <>
-              {movieResultData?.total_results !== 0 && (
+              {Boolean(movieResultData?.total_results) && (
                 <SearchMovieSlider
                   keyword={keyword}
                   loading={isMovieResultLoading}
@@ -97,7 +86,7 @@ function Search() {
                   title="Movie Results"
                 />
               )}
-              {tvResultData?.total_results !== 0 && (
+              {Boolean(tvResultData?.total_results) && (
                 <SearchTvSlider
                   keyword={keyword}
                   loading={isTvResultLoading}
@@ -106,7 +95,6 @@ function Search() {
                 />
               )}
             </>
-          )}
         </SearchResults>
       )}
     </>

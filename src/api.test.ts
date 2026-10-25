@@ -1,112 +1,27 @@
-import {
-  setApiKey,
-  getApiKey,
-  clearApiKey,
-  hasApiKey,
-  resolveKey,
-  safeFetchJson,
-  fetchNowPlayingMovie,
-  fetchSearchMovie,
-  API_KEY,
-} from "./api";
-
-describe("api module security and in-memory credential guarantees", () => {
-  const SYNTHETIC_KEY = "synthetic-test-key-1234567890abcdef";
-
-  beforeEach(() => {
-    clearApiKey();
-    jest.clearAllMocks();
-    global.fetch = jest.fn();
-  });
-
-  afterEach(() => {
-    clearApiKey();
-  });
-
-  test("API_KEY export is empty string (no hardcoded credentials)", () => {
-    expect(API_KEY).toBe("");
-  });
-
-  test("in-memory getter, setter, hasApiKey, and clearApiKey work purely in memory", () => {
-    expect(hasApiKey()).toBe(false);
-    expect(getApiKey()).toBe("");
-
-    setApiKey(SYNTHETIC_KEY);
-    expect(hasApiKey()).toBe(true);
-    expect(getApiKey()).toBe(SYNTHETIC_KEY);
-
-    clearApiKey();
-    expect(hasApiKey()).toBe(false);
-    expect(getApiKey()).toBe("");
-
-    // Verify no persistence in browser storage
-    expect(localStorage.getItem("apiKey")).toBeNull();
-    expect(sessionStorage.getItem("apiKey")).toBeNull();
-  });
-
-  test("no-key: calling fetch functions without a key rejects immediately without calling global.fetch", async () => {
-    expect(hasApiKey()).toBe(false);
-
-    await expect(fetchNowPlayingMovie()).rejects.toThrow(
-      "TMDB API key is missing. Please provide an API key in memory."
-    );
-    expect(global.fetch).not.toHaveBeenCalled();
-
-    await expect(fetchSearchMovie("avatar")).rejects.toThrow(
-      "TMDB API key is missing. Please provide an API key in memory."
-    );
-    expect(global.fetch).not.toHaveBeenCalled();
-  });
-
-  test("success: resolves explicit or in-memory key and calls fetch with encoded URL", async () => {
-    setApiKey(SYNTHETIC_KEY);
-    (global.fetch as jest.Mock).mockResolvedValueOnce({
-      ok: true,
-      json: async () => ({ results: [{ id: 1, title: "Test Movie" }] }),
-    });
-
-    const data = await fetchNowPlayingMovie();
-    expect(data.results[0].title).toBe("Test Movie");
-    expect(global.fetch).toHaveBeenCalledTimes(1);
-    const calledUrl = (global.fetch as jest.Mock).mock.calls[0][0];
-    expect(calledUrl).toContain(`api_key=${SYNTHETIC_KEY}`);
-  });
-
-  test("error: non-200 HTTP responses throw sanitized error and redact the key", async () => {
-    setApiKey(SYNTHETIC_KEY);
-    (global.fetch as jest.Mock).mockResolvedValueOnce({
-      ok: false,
-      status: 401,
-      statusText: "Unauthorized",
-    });
-
-    await expect(fetchNowPlayingMovie()).rejects.toThrow(
-      "TMDB API request failed with HTTP 401"
-    );
-
-    // Verify key was not included in error message
-    try {
-      await fetchNowPlayingMovie();
-    } catch (err: any) {
-      expect(err.message).not.toContain(SYNTHETIC_KEY);
-    }
-  });
-
-  test("no-network: network rejection does not leak the key", async () => {
-    setApiKey(SYNTHETIC_KEY);
-    (global.fetch as jest.Mock).mockRejectedValueOnce(
-      new Error(`Connection failed to endpoint with ${SYNTHETIC_KEY}`)
-    );
-
-    await expect(fetchNowPlayingMovie()).rejects.toThrow();
-    try {
-      (global.fetch as jest.Mock).mockRejectedValueOnce(
-        new Error(`Connection failed to endpoint with ${SYNTHETIC_KEY}`)
-      );
-      await fetchNowPlayingMovie();
-    } catch (err: any) {
-      expect(err.message).not.toContain(SYNTHETIC_KEY);
-      expect(err.message).toContain("[REDACTED_KEY]");
-    }
-  });
+import { API_KEY, clearApiKey, getApiKey, setApiKey, fetchNowPlayingMovie, fetchSearchMovie } from './api';
+const KEY = 'synthetic-credential/+?';
+beforeEach(() => { clearApiKey(); global.fetch = jest.fn(); });
+afterEach(() => clearApiKey());
+test('no bundled default key, and module clear removes its accessible value', () => {
+  expect(API_KEY).toBe(''); setApiKey(KEY); expect(getApiKey()).toBe(KEY); clearApiKey(); expect(getApiKey()).toBe('');
+});
+test('API guard rejects missing key before transport even without query enabled', async () => {
+  await expect(fetchNowPlayingMovie()).rejects.toThrow(); await expect(fetchSearchMovie('test')).rejects.toThrow();
+  expect(global.fetch).not.toHaveBeenCalled();
+});
+test('URL encoding and real AbortSignal reach the transport', async () => {
+  setApiKey(KEY); const controller = new AbortController();
+  (global.fetch as jest.Mock).mockResolvedValue({ ok: true, json: async () => ({ results: [] }) });
+  await fetchSearchMovie('한글 &/?', controller.signal);
+  const [url, options] = (global.fetch as jest.Mock).mock.calls[0];
+  expect(new URL(url).searchParams.get('api_key')).toBe(KEY);
+  expect(new URL(url).searchParams.get('query')).toBe('한글 &/?'); expect(options.signal).toBe(controller.signal);
+});
+test.each([401, 403, 500])('HTTP %s propagates only safe status, ignoring provider text containing a key', async status => {
+  setApiKey(KEY); (global.fetch as jest.Mock).mockResolvedValue({ ok: false, status, statusText: KEY });
+  await expect(fetchNowPlayingMovie()).rejects.toMatchObject({ status, message: `TMDB API request failed with HTTP ${status}` });
+});
+test('network rejection never propagates raw/encoded credential or arbitrary transport messages', async () => {
+  setApiKey(KEY); (global.fetch as jest.Mock).mockRejectedValue(new Error(`URL ${KEY} ${encodeURIComponent(KEY)}`));
+  await expect(fetchNowPlayingMovie()).rejects.toMatchObject({ message: 'TMDB network request failed' });
 });

@@ -10,9 +10,10 @@ export const windowSizeAtom = atom({
   default: { width: window.innerWidth, height: window.innerHeight },
 });
 
-export const apiKeyAtom = atom<string>({
-  key: "apiKeyAtom",
-  default: "",
+// Only a non-secret session identifier enters Recoil and React Query's cache.
+export const apiSessionAtom = atom({
+  key: "apiSessionAtom",
+  default: { generation: 0, enabled: false },
 });
 
 export const apiKeyModalOpenAtom = atom<boolean>({

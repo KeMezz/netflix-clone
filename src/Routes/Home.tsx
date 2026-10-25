@@ -1,5 +1,5 @@
-import { useEffect } from "react";
-import { useQuery } from "react-query";
+import { useTmdbQuery } from "../tmdb";
+import TmdbErrors from "../Components/TmdbErrors";
 import { useRecoilValue } from "recoil";
 import styled from "styled-components";
 import {
@@ -7,9 +7,8 @@ import {
   fetchNowPlayingMovie,
   fetchTopRatedMovie,
   fetchUpcomingMovie,
-  setApiKey,
 } from "../api";
-import { apiKeyAtom } from "../atom";
+import { apiSessionAtom } from "../atom";
 import ApiKeyNotice from "../Components/ApiKeyNotice";
 import MovieSlider from "../Components/MovieSlider";
 import { makeImgPath } from "../imgPath";
@@ -72,38 +71,18 @@ const BannerBox = styled.div`
 `;
 
 function Home() {
-  const apiKey = useRecoilValue(apiKeyAtom);
+  const { enabled } = useRecoilValue(apiSessionAtom);
 
-  useEffect(() => {
-    setApiKey(apiKey);
-  }, [apiKey]);
+  const nowPlayingDataQuery = useTmdbQuery<iMovieData>(["nowPlayingMovie"], (signal) => fetchNowPlayingMovie(signal));
+  const { isLoading: nowPlayingLoading, data: nowPlayingData } = nowPlayingDataQuery;
+  const topRatedMovieQuery = useTmdbQuery<iMovieData>(["topRatedMovie"], (signal) => fetchTopRatedMovie(signal));
+  const { isLoading: topRatedMovieLoading, data: topRatedMovie } = topRatedMovieQuery;
+  const upcomingMovieQuery = useTmdbQuery<iMovieData>(["upcomingMovie"], (signal) => fetchUpcomingMovie(signal));
+  const { isLoading: upcomingMovieLoading, data: upcomingMovie } = upcomingMovieQuery;
+  const latestMovieQuery = useTmdbQuery<iMovieData>(["latestMovie"], (signal) => fetchLatestMovie(signal));
+  const { isLoading: latestMovieLoading, data: latestMovie } = latestMovieQuery;
 
-  const { isLoading: nowPlayingLoading, data: nowPlayingData } =
-    useQuery<iMovieData>(
-      ["nowPlayingMovie", apiKey],
-      () => fetchNowPlayingMovie(apiKey),
-      { enabled: Boolean(apiKey) }
-    );
-  const { isLoading: topRatedMovieLoading, data: topRatedMovie } =
-    useQuery<iMovieData>(
-      ["topRatedMovie", apiKey],
-      () => fetchTopRatedMovie(apiKey),
-      { enabled: Boolean(apiKey) }
-    );
-  const { isLoading: upcomingMovieLoading, data: upcomingMovie } =
-    useQuery<iMovieData>(
-      ["upcomingMovie", apiKey],
-      () => fetchUpcomingMovie(apiKey),
-      { enabled: Boolean(apiKey) }
-    );
-  const { isLoading: latestMovieLoading, data: latestMovie } =
-    useQuery<iMovieData>(
-      ["latestMovie", apiKey],
-      () => fetchLatestMovie(apiKey),
-      { enabled: Boolean(apiKey) }
-    );
-
-  if (!apiKey) {
+  if (!enabled) {
     return (
       <Container>
         <ApiKeyNotice />
@@ -113,6 +92,7 @@ function Home() {
 
   return (
     <Container>
+      <TmdbErrors queries={[["Now Playing", nowPlayingDataQuery], ["Top Rated", topRatedMovieQuery], ["Upcoming", upcomingMovieQuery], ["Latest", latestMovieQuery]]} />
       <Banner
         bgPhoto={makeImgPath(nowPlayingData?.results?.[0]?.backdrop_path || "")}
       >
@@ -120,34 +100,34 @@ function Home() {
           <BannerBox>
             <h1>불러오는 중...</h1>
           </BannerBox>
-        ) : (
+        ) : nowPlayingData ? (
           <BannerBox>
             <h1>{nowPlayingData?.results?.[0]?.title}</h1>
             <h2>오늘 영화 순위 1위</h2>
             <h3>{nowPlayingData?.results?.[0]?.overview}</h3>
           </BannerBox>
-        )}
+        ) : null}
       </Banner>
-      <MovieSlider
+      {nowPlayingData && <MovieSlider
         loading={nowPlayingLoading}
         data={nowPlayingData}
         title="Now Playing"
-      />
-      <MovieSlider
+      />}
+      {latestMovie && <MovieSlider
         loading={latestMovieLoading}
         data={latestMovie}
         title="Latest"
-      />
-      <MovieSlider
+      />}
+      {topRatedMovie && <MovieSlider
         loading={topRatedMovieLoading}
         data={topRatedMovie}
         title="Top Rated"
-      />
-      <MovieSlider
+      />}
+      {upcomingMovie && <MovieSlider
         loading={upcomingMovieLoading}
         data={upcomingMovie}
         title="Upcoming"
-      />
+      />}
     </Container>
   );
 }

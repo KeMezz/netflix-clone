@@ -1,9 +1,8 @@
-import React, { useState } from "react";
-import { useRecoilState } from "recoil";
-import { useQueryClient } from "react-query";
+import React, { useEffect, useState } from "react";
+import { useSetRecoilState } from "recoil";
 import styled from "styled-components";
-import { apiKeyAtom, apiKeyModalOpenAtom } from "../atom";
-import { setApiKey, clearApiKey } from "../api";
+import { apiKeyModalOpenAtom } from "../atom";
+import { useApiSession } from "../tmdb";
 
 const NoticeWrapper = styled.section`
   display: flex;
@@ -137,27 +136,25 @@ interface ApiKeyNoticeProps {
 }
 
 export function ApiKeyNotice({ onSuccess }: ApiKeyNoticeProps) {
-  const [apiKey, setApiKeyState] = useRecoilState(apiKeyAtom);
-  const [, setModalOpen] = useRecoilState(apiKeyModalOpenAtom);
-  const [inputValue, setInputValue] = useState(apiKey);
-  const queryClient = useQueryClient();
+  const { enabled, generation, replaceKey } = useApiSession();
+  const setModalOpen = useSetRecoilState(apiKeyModalOpenAtom);
+  const [inputValue, setInputValue] = useState("");
+
+  useEffect(() => setInputValue(""), [generation]);
 
   const handleApply = (e: React.FormEvent) => {
     e.preventDefault();
-    const trimmed = inputValue.trim();
-    if (!trimmed) return;
-    setApiKey(trimmed);
-    setApiKeyState(trimmed);
+    if (!inputValue.trim()) return;
+    replaceKey(inputValue);
+    setInputValue("");
     setModalOpen(false);
     if (onSuccess) onSuccess();
   };
 
   const handleClear = () => {
-    clearApiKey();
-    setApiKeyState("");
+    replaceKey("");
     setInputValue("");
     setModalOpen(false);
-    queryClient.clear();
   };
 
   return (
@@ -170,7 +167,7 @@ export function ApiKeyNotice({ onSuccess }: ApiKeyNoticeProps) {
         <Description>
           The Movie Database (TMDB) API를 활용하여 실시간 콘텐츠를 제공합니다.
           <br />
-          API 키가 입력되지 않은 상태에서는 외부 네트워크 요청이 전혀 발생하지 않습니다.
+          API 키 입력 전에는 TMDB API 요청이 발생하지 않습니다. 기존 Google Fonts 및 Font Awesome CDN 요청은 별도입니다.
         </Description>
         <SecurityNotice>
           <p>
@@ -178,7 +175,7 @@ export function ApiKeyNotice({ onSuccess }: ApiKeyNoticeProps) {
             로컬 스토리지(localStorage)나 세션 스토리지(sessionStorage)에 영구 저장되지 않습니다.
           </p>
           <p>
-            <strong>⚠️ 노출 범위 안내:</strong> 브라우저 탭을 닫거나 '키 끄기' 클릭 시 메모리에서 즉시 파기되지만,
+            <strong>⚠️ 노출 범위 안내:</strong> 키 교체·끄기 및 페이지를 떠나는 pagehide 이벤트에서 앱 상태와 캐시에서 키를 제거하고 진행 중인 요청을 취소합니다. JavaScript 문자열의 완전한 즉시 파기는 보장할 수 없습니다.
             브라우저 개발자 도구(DevTools 네트워크 탭) 및 TMDB API 서버로 전송되는 요청에는 키가 포함되어 노출됩니다.
           </p>
         </SecurityNotice>
@@ -194,7 +191,7 @@ export function ApiKeyNotice({ onSuccess }: ApiKeyNoticeProps) {
             />
             <SubmitBtn type="submit">API 키 적용</SubmitBtn>
           </InputRow>
-          {apiKey && (
+          {enabled && (
             <ClearBtn type="button" onClick={handleClear}>
               키 끄기 / 삭제 (메모리 초기화)
             </ClearBtn>

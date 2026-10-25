@@ -4,7 +4,7 @@ import { useForm } from "react-hook-form";
 import { useMatch, useNavigate } from "react-router-dom";
 import { useRecoilState, useRecoilValue } from "recoil";
 import styled from "styled-components";
-import { apiKeyAtom, apiKeyModalOpenAtom, searchState } from "../atom";
+import { apiSessionAtom, apiKeyModalOpenAtom, searchState } from "../atom";
 import ApiKeyModal from "./ApiKeyModal";
 
 const Container = styled(motion.header)`
@@ -95,7 +95,7 @@ function Header() {
     setValue("search", "");
   };
   const [searchOpen, setSearchOpen] = useRecoilState(searchState);
-  const apiKey = useRecoilValue(apiKeyAtom);
+  const { enabled } = useRecoilValue(apiSessionAtom);
   const [, setModalOpen] = useRecoilState(apiKeyModalOpenAtom);
   const headerAnimation = useAnimation();
   const inputAnimation = useAnimation();
@@ -158,13 +158,13 @@ function Header() {
           <KeyBtn
             type="button"
             onClick={() => setModalOpen((prev) => !prev)}
-            title={apiKey ? "TMDB API 키 설정 / 끄기" : "TMDB API 키 입력"}
+            title={enabled ? "TMDB API 키 설정 / 끄기" : "TMDB API 키 입력"}
           >
             <i
               className="fas fa-key"
-              style={{ color: apiKey ? "#46d369" : "#e50914" }}
+              style={{ color: enabled ? "#ccc" : "#e50914" }}
             />
-            <span>{apiKey ? "API 키 활성" : "API 키 입력"}</span>
+            <span>{enabled ? "API 키 입력됨 (미검증)" : "API 키 입력"}</span>
           </KeyBtn>
           <SearchForm onSubmit={handleSubmit(onSearchValid)}>
             <SearchInput

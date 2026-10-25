@@ -1,9 +1,8 @@
 import { motion } from "framer-motion";
-import { useQuery } from "react-query";
-import { useRecoilValue } from "recoil";
 import styled from "styled-components";
 import { fetchMovieDetail } from "../api";
-import { apiKeyAtom } from "../atom";
+import { useTmdbQuery } from "../tmdb";
+import TmdbErrors from "./TmdbErrors";
 import { makeImgPath } from "../imgPath";
 import { useNavigate } from "react-router-dom";
 
@@ -131,12 +130,8 @@ interface iMovieDetail {
 }
 
 function MovieDetail({ movieId }: detailProps) {
-  const apiKey = useRecoilValue(apiKeyAtom);
-  const { data: movieData } = useQuery<iMovieDetail>(
-    [movieId, "movieDetail", apiKey],
-    () => fetchMovieDetail(movieId, apiKey),
-    { enabled: Boolean(apiKey && movieId) }
-  );
+  const detailQuery = useTmdbQuery<iMovieDetail>(["movieDetail", movieId], signal => fetchMovieDetail(movieId, signal), Boolean(movieId));
+  const { data: movieData } = detailQuery;
   const navigate = useNavigate();
   return (
     <DetailContainer
@@ -145,6 +140,8 @@ function MovieDetail({ movieId }: detailProps) {
       exit={{ opacity: 0, y: 100 }}
       transition={{ duration: 0.3 }}
     >
+      <TmdbErrors queries={[["movie detail", detailQuery]]} />
+      {detailQuery.isLoading && <p role="status">상세 정보를 불러오는 중...</p>}
       <CloseBtn onClick={() => navigate(-1)}>
         <svg
           xmlns="http://www.w3.org/2000/svg"

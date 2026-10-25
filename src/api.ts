@@ -15,119 +15,124 @@ export const clearApiKey = () => {
 
 export const hasApiKey = () => Boolean(inMemoryApiKey);
 
-export const resolveKey = (explicitKey?: string): string => {
-  const key = (explicitKey || inMemoryApiKey || "").trim();
-  if (!key) {
-    throw new Error("TMDB API key is missing. Please provide an API key in memory.");
+export class TmdbError extends Error {
+  constructor(public status?: number) {
+    super(status ? `TMDB API request failed with HTTP ${status}` : "TMDB network request failed");
+    this.name = "TmdbError";
   }
-  return key;
+}
+
+export const resolveKey = (): string => {
+  if (!inMemoryApiKey) throw new TmdbError(0);
+  return inMemoryApiKey;
 };
 
 export const safeFetchJson = async <T = any>(
   urlBuilder: (encodedKey: string) => string,
-  explicitKey?: string
+  signal?: AbortSignal
 ): Promise<T> => {
-  const key = resolveKey(explicitKey);
-  const url = urlBuilder(encodeURIComponent(key));
+  const key = resolveKey();
   try {
-    const response = await fetch(url);
-    if (!response.ok) {
-      throw new Error(`TMDB API request failed with HTTP ${response.status}`);
-    }
+    const response = await fetch(urlBuilder(encodeURIComponent(key)), { signal });
+    if (!response.ok) throw new TmdbError(response.status);
     return await response.json();
-  } catch (error: any) {
-    const message = error?.message ? String(error.message) : "Network request failed";
-    const sanitized = key ? message.split(key).join("[REDACTED_KEY]") : message;
-    throw new Error(sanitized);
+  } catch (error) {
+    if (signal?.aborted) {
+      const aborted = new Error("TMDB request cancelled");
+      aborted.name = "AbortError";
+      throw aborted;
+    }
+    // Never propagate transport/provider messages: they may contain the URL/key.
+    throw error instanceof TmdbError ? error : new TmdbError();
   }
 };
 
-export const fetchNowPlayingMovie = (apiKey?: string) => {
+export const fetchNowPlayingMovie = (signal?: AbortSignal) => {
   return safeFetchJson(
     (key) => `${BASE_URL}/movie/now_playing?api_key=${key}&language=ko&page=1`,
-    apiKey
+    signal
   );
 };
 
-export const fetchLatestMovie = (apiKey?: string) => {
+export const fetchLatestMovie = (signal?: AbortSignal) => {
   return safeFetchJson(
     (key) => `${BASE_URL}/movie/latest?api_key=${key}&language=ko&page=1`,
-    apiKey
+    signal
   );
 };
 
-export const fetchTopRatedMovie = (apiKey?: string) => {
+export const fetchTopRatedMovie = (signal?: AbortSignal) => {
   return safeFetchJson(
     (key) => `${BASE_URL}/movie/top_rated?api_key=${key}&language=ko&page=1`,
-    apiKey
+    signal
   );
 };
 
-export const fetchUpcomingMovie = (apiKey?: string) => {
+export const fetchUpcomingMovie = (signal?: AbortSignal) => {
   return safeFetchJson(
     (key) => `${BASE_URL}/movie/upcoming?api_key=${key}&language=ko&page=1`,
-    apiKey
+    signal
   );
 };
 
-export const fetchMovieDetail = (movieId?: number, apiKey?: string) => {
+export const fetchMovieDetail = (movieId?: number, signal?: AbortSignal) => {
   return safeFetchJson(
     (key) => `${BASE_URL}/movie/${movieId}?api_key=${key}&language=ko`,
-    apiKey
+    signal
   );
 };
 
-export const fetchPopularTvshows = (apiKey?: string) => {
+export const fetchPopularTvshows = (signal?: AbortSignal) => {
   return safeFetchJson(
     (key) => `${BASE_URL}/tv/popular?api_key=${key}&language=ko&page=1`,
-    apiKey
+    signal
   );
 };
 
-export const fetchLatestTvShows = (apiKey?: string) => {
+export const fetchLatestTvShows = (signal?: AbortSignal) => {
   return safeFetchJson(
     (key) => `${BASE_URL}/tv/latest?api_key=${key}&language=ko`,
-    apiKey
+    signal
   );
 };
 
-export const fetchAiringToday = (apiKey?: string) => {
+export const fetchAiringToday = (signal?: AbortSignal) => {
   return safeFetchJson(
     (key) => `${BASE_URL}/tv/airing_today?api_key=${key}&language=ko&page=1`,
-    apiKey
+    signal
   );
 };
 
-export const fetchTopRatedShows = (apiKey?: string) => {
+export const fetchTopRatedShows = (signal?: AbortSignal) => {
   return safeFetchJson(
     (key) => `${BASE_URL}/tv/top_rated?api_key=${key}&language=ko&page=1`,
-    apiKey
+    signal
   );
 };
 
-export const fetchTvDetail = (tvId?: number, apiKey?: string) => {
+export const fetchTvDetail = (tvId?: number, signal?: AbortSignal) => {
   return safeFetchJson(
     (key) => `${BASE_URL}/tv/${tvId}?api_key=${key}&language=ko`,
-    apiKey
+    signal
   );
 };
 
-export const fetchSearchMovie = (keywords?: string, apiKey?: string) => {
+export const fetchSearchMovie = (keywords?: string, signal?: AbortSignal) => {
   return safeFetchJson(
     (key) =>
       `${BASE_URL}/search/movie?api_key=${key}&language=ko&query=${encodeURIComponent(
         keywords || ""
       )}&page=1&include_adult=false`,
-    apiKey
+    signal
   );
 };
 
-export const fetchSearchTv = (keywords?: string, apiKey?: string) => {
+export const fetchSearchTv = (keywords?: string, signal?: AbortSignal) => {
   return safeFetchJson(
     (key) =>
       `${BASE_URL}/search/tv?api_key=${key}&language=ko&query=${encodeURIComponent(
         keywords || ""
       )}&page=1&include_adult=false`,
-    apiKey
+    signal
   );
 };
