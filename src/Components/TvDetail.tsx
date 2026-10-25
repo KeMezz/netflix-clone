@@ -1,6 +1,8 @@
 import { motion } from "framer-motion";
 import { useQuery } from "react-query";
+import { useRecoilValue } from "recoil";
 import { fetchTvDetail } from "../api";
+import { apiKeyAtom } from "../atom";
 import { makeImgPath } from "../imgPath";
 import {
   CloseBtn,
@@ -55,8 +57,11 @@ interface iTvDetail {
 }
 
 function TvDetail({ tvId }: detailProps) {
-  const { data: tvData } = useQuery<iTvDetail>([tvId, "tvDetail"], () =>
-    fetchTvDetail(tvId)
+  const apiKey = useRecoilValue(apiKeyAtom);
+  const { data: tvData } = useQuery<iTvDetail>(
+    [tvId, "tvDetail", apiKey],
+    () => fetchTvDetail(tvId, apiKey),
+    { enabled: Boolean(apiKey && tvId) }
   );
   const navigate = useNavigate();
   return (

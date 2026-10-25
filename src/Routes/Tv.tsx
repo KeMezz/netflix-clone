@@ -1,11 +1,16 @@
+import { useEffect } from "react";
 import { useQuery } from "react-query";
+import { useRecoilValue } from "recoil";
 import styled from "styled-components";
 import {
   fetchAiringToday,
   fetchLatestTvShows,
   fetchPopularTvshows,
   fetchTopRatedShows,
+  setApiKey,
 } from "../api";
+import { apiKeyAtom } from "../atom";
+import ApiKeyNotice from "../Components/ApiKeyNotice";
 import TvLatestSlider from "../Components/TvLatestSlider";
 import TvSlider from "../Components/TvSlider";
 import { makeImgPath } from "../imgPath";
@@ -68,18 +73,49 @@ const BannerBox = styled.div`
 `;
 
 function Tv() {
+  const apiKey = useRecoilValue(apiKeyAtom);
+
+  useEffect(() => {
+    setApiKey(apiKey);
+  }, [apiKey]);
+
   const { isLoading: popularTvLoading, data: popularTvData } =
-    useQuery<iTvData>("popularTv", fetchPopularTvshows);
+    useQuery<iTvData>(
+      ["popularTv", apiKey],
+      () => fetchPopularTvshows(apiKey),
+      { enabled: Boolean(apiKey) }
+    );
   const { isLoading: airingTodayLoading, data: airingToday } =
-    useQuery<iTvData>("airingToday", fetchAiringToday);
+    useQuery<iTvData>(
+      ["airingToday", apiKey],
+      () => fetchAiringToday(apiKey),
+      { enabled: Boolean(apiKey) }
+    );
   const { isLoading: topRatedShowsLoading, data: topRatedShows } =
-    useQuery<iTvData>("topRatedShows", fetchTopRatedShows);
+    useQuery<iTvData>(
+      ["topRatedShows", apiKey],
+      () => fetchTopRatedShows(apiKey),
+      { enabled: Boolean(apiKey) }
+    );
   const { isLoading: latestTvShowsLoading, data: latestTvShows } =
-    useQuery<iResults>("latestTV", fetchLatestTvShows);
+    useQuery<iResults>(
+      ["latestTV", apiKey],
+      () => fetchLatestTvShows(apiKey),
+      { enabled: Boolean(apiKey) }
+    );
+
+  if (!apiKey) {
+    return (
+      <Container>
+        <ApiKeyNotice />
+      </Container>
+    );
+  }
+
   return (
     <Container>
       <Banner
-        bgPhoto={makeImgPath(popularTvData?.results[0].backdrop_path || "")}
+        bgPhoto={makeImgPath(popularTvData?.results?.[0]?.backdrop_path || "")}
       >
         {popularTvLoading ? (
           <BannerBox>
@@ -87,9 +123,9 @@ function Tv() {
           </BannerBox>
         ) : (
           <BannerBox>
-            <h1>{popularTvData?.results[0].name}</h1>
+            <h1>{popularTvData?.results?.[0]?.name}</h1>
             <h2>현재 인기 TV 시리즈 1위</h2>
-            <h3>{popularTvData?.results[0].overview}</h3>
+            <h3>{popularTvData?.results?.[0]?.overview}</h3>
           </BannerBox>
         )}
       </Banner>

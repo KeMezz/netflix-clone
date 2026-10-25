@@ -1,7 +1,11 @@
+import { useEffect } from "react";
 import { useQuery } from "react-query";
 import { useParams } from "react-router-dom";
+import { useRecoilValue } from "recoil";
 import styled from "styled-components";
-import { fetchSearchMovie, fetchSearchTv } from "../api";
+import { fetchSearchMovie, fetchSearchTv, setApiKey } from "../api";
+import { apiKeyAtom } from "../atom";
+import ApiKeyNotice from "../Components/ApiKeyNotice";
 import SearchMovieSlider from "../Components/SearchMovieSlider";
 import SearchTvSlider from "../Components/SearchTvSlider";
 
@@ -52,17 +56,32 @@ export interface iSearchResults {
 
 function Search() {
   const { keyword } = useParams();
+  const apiKey = useRecoilValue(apiKeyAtom);
+
+  useEffect(() => {
+    setApiKey(apiKey);
+  }, [apiKey]);
+
   const { isLoading: isMovieResultLoading, data: movieResultData } =
-    useQuery<iSearchResults>([keyword, "movieSearch"], () =>
-      fetchSearchMovie(keyword)
+    useQuery<iSearchResults>(
+      [keyword, "movieSearch", apiKey],
+      () => fetchSearchMovie(keyword, apiKey),
+      { enabled: Boolean(apiKey && keyword) }
     );
   const { isLoading: isTvResultLoading, data: tvResultData } =
-    useQuery<iSearchResults>([keyword, "tvSearch"], () =>
-      fetchSearchTv(keyword)
+    useQuery<iSearchResults>(
+      [keyword, "tvSearch", apiKey],
+      () => fetchSearchTv(keyword, apiKey),
+      { enabled: Boolean(apiKey && keyword) }
     );
+
+  if (!apiKey) {
+    return <ApiKeyNotice />;
+  }
+
   return (
     <>
-      {movieResultData?.total_results === 0 ? (
+      {movieResultData?.total_results === 0 && tvResultData?.total_results === 0 ? (
         <NoResults>검색 결과가 없습니다</NoResults>
       ) : (
         <SearchResults>

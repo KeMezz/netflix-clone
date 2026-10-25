@@ -9,3 +9,13 @@ export const windowSizeAtom = atom({
   key: "windowSizeAtom",
   default: { width: window.innerWidth, height: window.innerHeight },
 });
+
+export const apiKeyAtom = atom<string>({
+  key: "apiKeyAtom",
+  default: "",
+});
+
+export const apiKeyModalOpenAtom = atom<boolean>({
+  key: "apiKeyModalOpenAtom",
+  default: false,
+});

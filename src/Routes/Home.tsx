@@ -1,11 +1,16 @@
+import { useEffect } from "react";
 import { useQuery } from "react-query";
+import { useRecoilValue } from "recoil";
 import styled from "styled-components";
 import {
   fetchLatestMovie,
   fetchNowPlayingMovie,
   fetchTopRatedMovie,
   fetchUpcomingMovie,
+  setApiKey,
 } from "../api";
+import { apiKeyAtom } from "../atom";
+import ApiKeyNotice from "../Components/ApiKeyNotice";
 import MovieSlider from "../Components/MovieSlider";
 import { makeImgPath } from "../imgPath";
 
@@ -67,18 +72,49 @@ const BannerBox = styled.div`
 `;
 
 function Home() {
+  const apiKey = useRecoilValue(apiKeyAtom);
+
+  useEffect(() => {
+    setApiKey(apiKey);
+  }, [apiKey]);
+
   const { isLoading: nowPlayingLoading, data: nowPlayingData } =
-    useQuery<iMovieData>("nowPlayingMovie", fetchNowPlayingMovie);
+    useQuery<iMovieData>(
+      ["nowPlayingMovie", apiKey],
+      () => fetchNowPlayingMovie(apiKey),
+      { enabled: Boolean(apiKey) }
+    );
   const { isLoading: topRatedMovieLoading, data: topRatedMovie } =
-    useQuery<iMovieData>("topRatedMovie", fetchTopRatedMovie);
+    useQuery<iMovieData>(
+      ["topRatedMovie", apiKey],
+      () => fetchTopRatedMovie(apiKey),
+      { enabled: Boolean(apiKey) }
+    );
   const { isLoading: upcomingMovieLoading, data: upcomingMovie } =
-    useQuery<iMovieData>("upcomingMovie", fetchUpcomingMovie);
+    useQuery<iMovieData>(
+      ["upcomingMovie", apiKey],
+      () => fetchUpcomingMovie(apiKey),
+      { enabled: Boolean(apiKey) }
+    );
   const { isLoading: latestMovieLoading, data: latestMovie } =
-    useQuery<iMovieData>("upcomingMovie", fetchLatestMovie);
+    useQuery<iMovieData>(
+      ["latestMovie", apiKey],
+      () => fetchLatestMovie(apiKey),
+      { enabled: Boolean(apiKey) }
+    );
+
+  if (!apiKey) {
+    return (
+      <Container>
+        <ApiKeyNotice />
+      </Container>
+    );
+  }
+
   return (
     <Container>
       <Banner
-        bgPhoto={makeImgPath(nowPlayingData?.results[0].backdrop_path || "")}
+        bgPhoto={makeImgPath(nowPlayingData?.results?.[0]?.backdrop_path || "")}
       >
         {nowPlayingLoading ? (
           <BannerBox>
@@ -86,9 +122,9 @@ function Home() {
           </BannerBox>
         ) : (
           <BannerBox>
-            <h1>{nowPlayingData?.results[0].title}</h1>
+            <h1>{nowPlayingData?.results?.[0]?.title}</h1>
             <h2>오늘 영화 순위 1위</h2>
-            <h3>{nowPlayingData?.results[0].overview}</h3>
+            <h3>{nowPlayingData?.results?.[0]?.overview}</h3>
           </BannerBox>
         )}
       </Banner>

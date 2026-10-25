@@ -1,7 +1,9 @@
 import { motion } from "framer-motion";
 import { useQuery } from "react-query";
+import { useRecoilValue } from "recoil";
 import styled from "styled-components";
 import { fetchMovieDetail } from "../api";
+import { apiKeyAtom } from "../atom";
 import { makeImgPath } from "../imgPath";
 import { useNavigate } from "react-router-dom";
 
@@ -129,9 +131,11 @@ interface iMovieDetail {
 }
 
 function MovieDetail({ movieId }: detailProps) {
+  const apiKey = useRecoilValue(apiKeyAtom);
   const { data: movieData } = useQuery<iMovieDetail>(
-    [movieId, "movieDetail"],
-    () => fetchMovieDetail(movieId)
+    [movieId, "movieDetail", apiKey],
+    () => fetchMovieDetail(movieId, apiKey),
+    { enabled: Boolean(apiKey && movieId) }
   );
   const navigate = useNavigate();
   return (
